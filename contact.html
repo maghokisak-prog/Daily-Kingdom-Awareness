@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Contact — Daily Kingdom Awareness</title>
+  <meta name="description" content="Contact Daily Kingdom Awareness for prayer requests, volunteering, and ministry enquiries." />
+  <style>
+    :root{--bg:#fbfaf9;--panel:#fff;--accent:#d4af37;--muted:#6b6b6b;--text:#111827;--radius:12px;--maxw:900px}
+    html{scroll-behavior:smooth}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui, -apple-system, "Segoe UI", Roboto, Arial;background:linear-gradient(180deg,#f8f6f3,var(--bg));display:flex;justify-content:center;padding:28px;color:var(--text)}
+    .wrap{width:100%;max-width:var(--maxw)}
+    header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+    nav a{margin-left:12px;color:var(--muted);text-decoration:none;font-weight:700}
+    main{background:#fff;padding:22px;border-radius:12px;border:1px solid rgba(0,0,0,0.04)}
+    .card{background:#fff;padding:14px;border-radius:10px;border:1px solid rgba(0,0,0,0.03)}
+    input,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(0,0,0,0.06);margin-top:6px}
+    .btn{background:var(--accent);color:#07120a;padding:10px 12px;border-radius:9px;border:0;font-weight:800}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div style="font-weight:800">Daily Kingdom Awareness — Contact</div>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="ministry.html">Ministry</a>
+        <a href="studies.html">Bible Studies</a>
+        <a href="videos.html">Videos</a>
+        <a href="prayer.html">Prayers</a>
+      </nav>
+    </header>
+
+    <main>
+      <h2 style="margin-top:0">Contact & Prayer Requests</h2>
+
+      <div class="card">
+        <p style="color:var(--muted)">Need prayer or want to volunteer? Send us a message and we'll pray with you. (This form opens your email client.)</p>
+
+        <form id="contactForm" onsubmit="sendEmail(event)">
+          <label>Name</label>
+          <input id="cname" required placeholder="Your name">
+          <label>Email</label>
+          <input id="cemail" type="email" required placeholder="you@example.com">
+          <label>Message / Prayer Request</label>
+          <textarea id="cmsg" rows="6" required placeholder="Write your message or prayer request..."></textarea>
+          <button class="btn" type="submit" style="margin-top:10px">Send Message</button>
+        </form>
+        <div id="cstatus" style="margin-top:10px;color:var(--muted)"></div>
+      </div>
+
+      <section style="margin-top:12px">
+        <div class="card">
+          <strong>Direct Contact</strong>
+          <p style="color:var(--muted);margin-top:8px">Email: <a href="mailto:maghokisak@gmail.com">maghokisak@gmail.com</a><br/>Phone: <a href="tel:0745363724">0745363724</a></p>
+          <div style="margin-top:8px">
+            Follow: <a href="https://facebook.com/DailyKingdomAwareness" style="color:var(--muted)">Facebook</a> • <a href="https://instagram.com/DailyKingdomAwareness" style="color:var(--muted)">Instagram</a>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+<script>
+  function sendEmail(e){
+    e.preventDefault();
+    const name = encodeURIComponent(document.getElementById('cname').value.trim());
+    const email = encodeURIComponent(document.getElementById('cemail').value.trim());
+    const msg = encodeURIComponent(document.getElementById('cmsg').value.trim());
+    const to = 'maghokisak@gmail.com';
+    const subject = encodeURIComponent('Website message from '+(name||'visitor'));
+    const body = encodeURIComponent('Name: '+name+'\nEmail: '+email+'\n\nMessage:\n'+msg);
+    const mailto = 'mailto:'+to+'?subject='+subject+'&body='+body;
+    window.location.href = mailto;
+    document.getElementById('cstatus').textContent = 'Opening your email client...';
+  }
+      
+</script>
+      
+</body>
+</html>

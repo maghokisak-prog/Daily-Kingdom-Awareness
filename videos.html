@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Daily Kingdom Awareness — Videos</title>
+  <meta name="description" content="Video resources and teachings. Add YouTube or Vimeo links for viewers to watch." />
+  <style>
+    :root{--bg:#fbfaf9;--panel:#fff;--accent:#d4af37;--muted:#6b6b6b;--text:#111827;--radius:12px;--maxw:1100px}
+    html{scroll-behavior:smooth}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui, -apple-system, "Segoe UI", Roboto, Arial;background:linear-gradient(180deg,#f8f6f3,var(--bg));display:flex;justify-content:center;padding:28px;color:var(--text)}
+    .wrap{width:100%;max-width:var(--maxw)}
+    header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+    nav a{margin-left:12px;color:var(--muted);text-decoration:none;font-weight:700}
+    main{background:#fff;padding:22px;border-radius:12px;border:1px solid rgba(0,0,0,0.04)}
+    .grid{display:grid;grid-template-columns:1fr 360px;gap:16px}
+    .card{background:#fff;padding:14px;border-radius:10px;border:1px solid rgba(0,0,0,0.03)}
+    .videoItem{padding:10px;border-radius:10px;background:linear-gradient(180deg,#fbfbfb,#fff);margin-bottom:8px;border:1px solid rgba(0,0,0,0.02)}
+    input{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(0,0,0,0.06);margin-top:6px}
+    .btn{background:var(--accent);color:#07120a;padding:10px 12px;border-radius:9px;border:0;font-weight:800;cursor:pointer}
+    small{color:var(--muted)}
+    iframe{width:100%;aspect-ratio:16/9;border:none;border-radius:8px}
+    video{width:100%;border-radius:8px;max-height:520px}
+    @media(max-width:980px){.grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div style="font-weight:800">Daily Kingdom Awareness — Videos</div>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="ministry.html">Ministry</a>
+        <a href="studies.html">Studies</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+    </header>
+
+    <main>
+      <div class="grid">
+        <div>
+          <h2 style="margin-top:0">Videos & Resources</h2>
+
+          <div id="videosList" class="card" style="min-height:160px"></div>
+
+          <!-- Login Form -->
+          <section id="loginSection" style="margin-top:14px">
+            <h3>Admin Login</h3>
+            <div class="card">
+              <label>Email</label>
+              <input id="loginEmail" type="email" placeholder="Your admin email" />
+              <label>Password</label>
+              <input id="loginPass" type="password" placeholder="Your password" />
+              <button id="loginBtn" class="btn" style="margin-top:10px">Login</button>
+              <div id="loginStatus" style="margin-top:8px;color:var(--muted)"></div>
+            </div>
+          </section>
+
+          <!-- Add Video Form -->
+          <section id="uploadSection" style="margin-top:14px;display:none">
+            <h3>Add a Video</h3>
+            <div class="card">
+              <label>Title</label>
+              <input id="videoTitle" placeholder="Example: Sunday Message — Faith in Action" />
+              <label>Video Link (YouTube, Vimeo, etc.)</label>
+              <input id="videoLink" placeholder="https://www.youtube.com/watch?v=xxxxxx" />
+              
+              <!-- ADDED: file input for uploading recorded videos -->
+              <label>Or upload a video file (mp4, webm, ogg)</label>
+              <input id="videoFile" type="file" accept="video/*" />
+
+              <button id="addVideo" class="btn" style="margin-top:10px">Add Video</button>
+              <div id="videoStatus" style="margin-top:8px;color:var(--muted)"></div>
+              <button id="logoutBtn" class="btn" style="margin-top:10px;background:#ccc;color:#000">Logout</button>
+            </div>
+          </section>
+        </div>
+
+        <aside>
+          <div class="card">
+            <strong>Online Bible</strong>
+            <p style="color:var(--muted);margin-top:8px">
+              We recommend: <a href="https://www.biblegateway.com" target="_blank" style="color:var(--muted)">Bible Gateway</a> or 
+              <a href="https://www.youversion.com" target="_blank" style="color:var(--muted)">YouVersion</a>.
+            </p>
+          </div>
+        </aside>
+      </div>
+    </main>
+  </div>
+
+<script>
+  const VIDEOS_KEY = 'dk_videos_v1';
+  const ADMIN_EMAIL = 'maghokisak@gmail.com'; // Your email
+  const ADMIN_PASS = 'G0745363724'; // Change this if you want
+  const LOGIN_KEY = 'dk_admin_logged_videos';
+
+  const videosListEl = document.getElementById('videosList');
+  const loginSection = document.getElementById('loginSection');
+  const uploadSection = document.getElementById('uploadSection');
+
+  function escapeHtml(text){return (text||'').replace(/[&<>"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[m]);}
+
+  function convertToEmbed(link){
+    if(!link) return '';
+    if(link.includes('youtube.com/watch?v=')){
+      return link.replace('watch?v=','embed/');
+    } else if(link.includes('youtu.be/')){
+      return link.replace('youtu.be/','www.youtube.com/embed/');
+    } else if(link.includes('vimeo.com/')){
+      return link.replace('vimeo.com/','player.vimeo.com/video/');
+    }
+    return link;
+  }
+
+  function loadVideos(){
+    const raw = localStorage.getItem(VIDEOS_KEY);
+    const arr = raw ? JSON.parse(raw) : [];
+    renderVideos(arr);
+  }
+
+  function renderVideos(arr){
+    if(!arr.length){
+      videosListEl.innerHTML = '<div style="color:#6b6b6b">No videos yet — add one using the admin panel.</div>';
+      return;
+    }
+    const isAdmin = localStorage.getItem(LOGIN_KEY) === 'true';
+    videosListEl.innerHTML = arr.map((v, i) => {
+      const safeTitle = escapeHtml(v.title || 'Untitled');
+      let mediaHtml = '';
+      // if entry is an uploaded video (data: or blob: or marked isFile), render <video>
+      if(v.isFile || (v.link && (v.link.startsWith('data:video') || v.link.startsWith('blob:') || /\.mp4$|\.webm$|\.ogg$/i.test(v.link)))){
+        mediaHtml = `<video controls><source src="${v.link}"></video>`;
+      } else {
+        // otherwise assume it's an embeddable link
+        const embed = convertToEmbed(v.link || '');
+        mediaHtml = `<iframe src="${embed}" allowfullscreen></iframe>`;
+      }
+      return `
+        <div class="videoItem">
+          <strong>${safeTitle}</strong>
+          <div style="margin-top:8px">${mediaHtml}</div>
+          ${isAdmin ? `<button class="btn" style="margin-top:8px;background:#e74c3c;color:#fff" onclick="deleteVideo(${i})">Delete</button>` : ''}
+        </div>
+      `;
+    }).join('');
+  }
+
+  function deleteVideo(index){
+    if(!confirm("Are you sure you want to delete this video?")) return;
+    let arr = JSON.parse(localStorage.getItem(VIDEOS_KEY) || '[]');
+    // If this entry used a blob URL, revoke it so memory is freed
+    try{
+      const entry = arr[index];
+      if(entry && entry.link && entry.link.startsWith('blob:')) {
+        try { URL.revokeObjectURL(entry.link); } catch(e) {}
+      }
+    } catch(e){}
+    arr.splice(index, 1);
+    localStorage.setItem(VIDEOS_KEY, JSON.stringify(arr));
+    loadVideos();
+  }
+
+  document.getElementById('loginBtn').addEventListener('click', ()=>{
+    const email = document.getElementById('loginEmail').value.trim();
+    const pass = document.getElementById('loginPass').value.trim();
+    if(email === ADMIN_EMAIL && pass === ADMIN_PASS){
+      localStorage.setItem(LOGIN_KEY, 'true');
+      showUploadSection();
+      loadVideos();
+    } else {
+      document.getElementById('loginStatus').textContent = 'Invalid email or password.';
+    }
+  });
+
+  document.getElementById('logoutBtn').addEventListener('click', ()=>{
+    localStorage.removeItem(LOGIN_KEY);
+    showLoginSection();
+    loadVideos();
+  });
+
+  document.getElementById('addVideo').addEventListener('click', ()=>{
+    const title = document.getElementById('videoTitle').value.trim();
+    const link = document.getElementById('videoLink').value.trim();
+    const fileInput = document.getElementById('videoFile');
+    const file = (fileInput && fileInput.files && fileInput.files[0]) ? fileInput.files[0] : null;
+
+    if(!title || (!link && !file)){
+      document.getElementById('videoStatus').textContent = 'Please enter a title and either a link or upload a file.';
+      return;
+    }
+
+    let arr = JSON.parse(localStorage.getItem(VIDEOS_KEY) || '[]');
+
+    // Helper to finish adding
+    function afterAdd(){
+      document.getElementById('videoStatus').textContent = 'Video added.';
+      document.getElementById('videoTitle').value='';
+      document.getElementById('videoLink').value='';
+      if(fileInput) fileInput.value='';
+      loadVideos();
+    }
+
+    if(file){
+      // Try to save small files as data URL so they persist. For large files fallback to blob URL.
+      const MAX_SAVE_BYTES = 2 * 1024 * 1024; // 2 MB - conservative threshold for localStorage
+      if(file.size <= MAX_SAVE_BYTES){
+        const reader = new FileReader();
+        reader.onload = function(e){
+          const dataUrl = e.target.result;
+          arr.unshift({title, link: dataUrl, isFile: true, fileName: file.name, created: new Date().toISOString()});
+          try{
+            localStorage.setItem(VIDEOS_KEY, JSON.stringify(arr));
+            afterAdd();
+          }catch(err){
+            // fallback to blob url if storage fails
+            const blobUrl = URL.createObjectURL(file);
+            arr.unshift({title, link: blobUrl, isFile: true, fileName: file.name, blob:true, created: new Date().toISOString()});
+            localStorage.setItem(VIDEOS_KEY, JSON.stringify(arr));
+            document.getElementById('videoStatus').textContent = 'Video added (temporary blob URL, won\'t persist after closing tab).';
+            afterAdd();
+          }
+        };
+        reader.readAsDataURL(file);
+      } else {
+        // large file: use blob URL (works until tab is open). Save entry so it can be deleted, but blob won't persist across sessions.
+        const blobUrl = URL.createObjectURL(file);
+        arr.unshift({title, link: blobUrl, isFile: true, fileName: file.name, blob:true, created: new Date().toISOString()});
+        try{
+          localStorage.setItem(VIDEOS_KEY, JSON.stringify(arr));
+          document.getElementById('videoStatus').textContent = 'Video added (large file - temporary blob URL, won\'t persist after closing tab).';
+        }catch(e){
+          // If localStorage fails, still show in current session (not saved)
+          console.warn('Could not save large video entry to localStorage:', e);
+          document.getElementById('videoStatus').textContent = 'Video added to this session (not saved).';
+        }
+        afterAdd();
+      }
+    } else {
+      // link only
+      arr.unshift({title, link, created: new Date().toISOString()});
+      localStorage.setItem(VIDEOS_KEY, JSON.stringify(arr));
+      afterAdd();
+    }
+  });
+
+  function showUploadSection(){
+    loginSection.style.display = 'none';
+    uploadSection.style.display = 'block';
+  }
+
+  function showLoginSection(){
+    loginSection.style.display = 'block';
+    uploadSection.style.display = 'none';
+  }
+
+  // Initial load
+  if(localStorage.getItem(LOGIN_KEY) === 'true'){
+    showUploadSection();
+  } else {
+    showLoginSection();
+  }
+
+  loadVideos();
+</script>
+
+</body>
+</html>
