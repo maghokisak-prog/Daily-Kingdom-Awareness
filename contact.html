@@ -16,7 +16,7 @@
     main{background:#fff;padding:22px;border-radius:12px;border:1px solid rgba(0,0,0,0.04)}
     .card{background:#fff;padding:14px;border-radius:10px;border:1px solid rgba(0,0,0,0.03)}
     input,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(0,0,0,0.06);margin-top:6px}
-    .btn{background:var(--accent);color:#07120a;padding:10px 12px;border-radius:9px;border:0;font-weight:800}
+    .btn{background:var(--accent);color:#07120a;padding:10px 12px;border-radius:9px;border:0;font-weight:800;cursor:pointer}
   </style>
 </head>
 <body>
@@ -36,18 +36,21 @@
       <h2 style="margin-top:0">Contact & Prayer Requests</h2>
 
       <div class="card">
-        <p style="color:var(--muted)">Need prayer or want to volunteer? Send us a message and we'll pray with you. (This form opens your email client.)</p>
+        <p style="color:var(--muted)">Need prayer or want to volunteer? Fill out the form below and we’ll receive your request directly.</p>
 
-        <form id="contactForm" onsubmit="sendEmail(event)">
+        <!-- ✅ FORM HANDLED BY FORMSPREE -->
+        <form action="https://formspree.io/f/xyzdyrve" method="POST">
           <label>Name</label>
-          <input id="cname" required placeholder="Your name">
+          <input name="name" required placeholder="Your name">
+          
           <label>Email</label>
-          <input id="cemail" type="email" required placeholder="you@example.com">
+          <input name="email" type="email" required placeholder="you@example.com">
+          
           <label>Message / Prayer Request</label>
-          <textarea id="cmsg" rows="6" required placeholder="Write your message or prayer request..."></textarea>
-          <button class="btn" type="submit" style="margin-top:10px">Send Message</button>
+          <textarea name="message" rows="6" required placeholder="Write your message or prayer request..."></textarea>
+          
+          <button class="btn" type="submit" style="margin-top:10px">Send Request</button>
         </form>
-        <div id="cstatus" style="margin-top:10px;color:var(--muted)"></div>
       </div>
 
       <section style="margin-top:12px">
@@ -61,22 +64,5 @@
       </section>
     </main>
   </div>
-
-<script>
-  function sendEmail(e){
-    e.preventDefault();
-    const name = encodeURIComponent(document.getElementById('cname').value.trim());
-    const email = encodeURIComponent(document.getElementById('cemail').value.trim());
-    const msg = encodeURIComponent(document.getElementById('cmsg').value.trim());
-    const to = 'maghokisak@gmail.com';
-    const subject = encodeURIComponent('Website message from '+(name||'visitor'));
-    const body = encodeURIComponent('Name: '+name+'\nEmail: '+email+'\n\nMessage:\n'+msg);
-    const mailto = 'mailto:'+to+'?subject='+subject+'&body='+body;
-    window.location.href = mailto;
-    document.getElementById('cstatus').textContent = 'Opening your email client...';
-  }
-      
-</script>
-      
 </body>
 </html>
