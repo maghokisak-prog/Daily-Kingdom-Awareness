@@ -40,6 +40,16 @@
       <div class="grid">
         <div>
           <h2 style="margin-top:0">Bible Studies & Resources</h2>
+
+          <!-- 🔹 Search Bar -->
+          <div class="card" style="margin-bottom:14px">
+            <input 
+              type="text" 
+              id="searchBar" 
+              placeholder="Search studies by title, link, or file..." 
+              style="padding:12px;font-size:1rem;border-radius:8px;width:100%;border:1px solid rgba(0,0,0,0.08)"
+            />
+          </div>
           
           <div id="studiesList" class="card" style="min-height:160px"></div>
 
@@ -73,6 +83,7 @@
             </div>
           </section>
         </div>
+
 <section style="margin:20px 0; padding:16px; background:#f0f4f8; border-radius:12px; max-width:600px; font-style:italic;">
   <strong>Bible Verse of the Day:</strong>
   <p id="verseOfDay" style="margin-top:8px; font-size:1.1rem; color:#333;"></p>
@@ -83,10 +94,7 @@
   "Romans 8:28 — And we know that for those who love God all things work together for good.",
   "Isaiah 41:10 — Fear not, for I am with you; be not dismayed, for I am your God.",
   "Philippians 4:13 — I can do all things through Him who strengthens me.",
-  // Add more verses here as you like
 ];
-
-// Function to get verse index based on current day of the year
 function getVerseIndex() {
   const now = new Date();
   const start = new Date(now.getFullYear(), 0, 0);
@@ -95,15 +103,14 @@ function getVerseIndex() {
   const dayOfYear = Math.floor(diff / oneDay);
   return dayOfYear % verses.length;
 }
-
 function showVerseOfTheDay() {
   const verseEl = document.getElementById("verseOfDay");
   const index = getVerseIndex();
   verseEl.textContent = verses[index];
 }
-
 showVerseOfTheDay();
 </script>
+
         <aside>
           <div class="card">
             <strong>Online Bible</strong>
@@ -215,6 +222,26 @@ showVerseOfTheDay();
     uploadSection.style.display = 'none';
   }
 
+  // 🔹 Enhanced Search Function
+  function filterStudies() {
+    const query = document.getElementById('searchBar').value.toLowerCase();
+    const raw = localStorage.getItem(STUDIES_KEY);
+    const arr = raw ? JSON.parse(raw) : [];
+
+    const filtered = arr.filter(s => {
+      return (
+        (s.title && s.title.toLowerCase().includes(query)) ||
+        (s.link && s.link.toLowerCase().includes(query)) ||
+        (s.fileName && s.fileName.toLowerCase().includes(query))
+      );
+    });
+
+    renderStudies(filtered);
+  }
+
+  // Attach search listener
+  document.getElementById('searchBar').addEventListener('input', filterStudies);
+
   // Initial load
   if(localStorage.getItem(LOGIN_KEY) === 'true'){
     showUploadSection();
@@ -226,3 +253,4 @@ showVerseOfTheDay();
 
 </body>
 </html>
+
